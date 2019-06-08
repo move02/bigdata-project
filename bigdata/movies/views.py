@@ -9,7 +9,10 @@ import mimetypes
 # from .forms import PostForm, CommentForm
 
 def index(request):        
-    return render(request, 'movies/index.html')
+    return render(request, 'index.html')
+
+def login(request):        
+    return render(request, 'login-register.html')
 
 def genres_count(request):
     filename = '/Users/move0/dev/django/bigdata/bigdata/static/movies/data/recent_genre.csv'
