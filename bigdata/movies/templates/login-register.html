@@ -51,6 +51,57 @@
     <!-- modernizr JS
 		============================================ -->
     <script src="/static/notika/js/vendor/modernizr-2.8.3.min.js"></script>
+    <!--VUE/AJAX 동작 코드 -->  
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+      $(document).ready(function(){
+        // VUE+AJAX : 로그인
+        // 기능1 : LoginActive로 POST를 보내 결과를 받는다.
+        // 기능2 : 로그인 성공/실패를 판단,경고를 띄우거나 리디렉션한다.
+            var login_app = new Vue({
+                  el: '#login_app',
+                  data: {
+                    // 안내 메시지의 기본 상태, 이 값을 실시간으로 바꿈
+                    alertmsg : '이 페이지는 테스트 버전으로 동작 중입니다.',
+                    alertcolor : 'alert-warning'
+                  },
+                 created: function () { // 문서를 불러오면 시작되는 메소드
+                 },
+                methods: { // 일반 메소드
+                    submit: function (event) { // Submit 버튼 클릭으로 호출시
+                     //메소드 내부는 JQuery와 AJAX로 구현
+                        var id,pw;
+                        id=$("#id").val();
+                        pw=$("#pw").val();
+                        alert('버튼이 눌렸습니다.'+id+pw);
+                        var url="/loginActive"; 
+                        $.ajax({      
+                            type:"POST",  
+                            url:url,      
+                            data:{"id":id,"pw":pw}, 
+                            //반환된 결과(Data)기준 로그인 성공/실패 판정
+                            success: function(data){
+                                // !!! 이부분에 결과처리
+                                /*
+                                if (data.length){ 
+                                    location.href='/'; 
+                                }else{
+                                    login_app.alertmsg = "아이디나 비밀번호가 잘못되었습니다."; // AJAX안에서는 this를 쓰지 못하므로, app이름으로 접근함
+                                    login_app.alertcolor = "alert-danger";
+                                }
+                                */
+                            }
+                            ,   
+                            error:function(e){  
+                                alert(e.responseText);  
+                            } 
+                        });
+                    }
+                }
+            })
+    });  
+    </script>
 </head>
 
 <body>
@@ -62,23 +113,23 @@
         <!-- Login -->
         <div class="nk-block toggled" id="l-login">
             <a href="/movies"><img src="/static/notika/img/logo/big_logo.png"></a>
-            <div class="nk-form">
+            <div class="nk-form" id="login_app">
                 <div class="input-group">
                     <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-support"></i></span>
                     <div class="nk-int-st">
-                        <input type="text" class="form-control" placeholder="Username">
+                        <input id="id" type="text" class="form-control" placeholder="Username">
                     </div>
                 </div>
                 <div class="input-group mg-t-15">
                     <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-edit"></i></span>
                     <div class="nk-int-st">
-                        <input type="password" class="form-control" placeholder="Password">
+                        <input id="pw" type="password" class="form-control" placeholder="Password">
                     </div>
                 </div>
                 <div class="fm-checkbox">
                     <label><input type="checkbox" class="i-checks"> <i></i> Keep me signed in</label>
                 </div>
-                <a href="#l-register" data-ma-action="nk-login-switch" data-ma-block="#l-register" class="btn btn-login btn-success btn-float"><i class="notika-icon notika-right-arrow right-arrow-ant"></i></a>
+                <a v-on:click="submit" class="btn btn-login btn-success btn-float"><i class="notika-icon notika-right-arrow right-arrow-ant"></i></a>
             </div>
             <div class="nk-navigation nk-lg-ic">
                 <a href="#" data-ma-action="nk-login-switch" data-ma-block="#l-register"><i class="notika-icon notika-plus-symbol"></i> <span>Register</span></a>
@@ -145,7 +196,10 @@
             </div>
         </div>
     </div>
-    <!-- Login Register area End-->
+    
+</body>
+
+<!-- Login Register area End-->
     <!-- jquery
 		============================================ -->
     <script src="/static/notika/js/vendor/jquery-1.12.4.min.js"></script>
@@ -212,6 +266,5 @@
     <!-- main JS
 		============================================ -->
     <script src="/static/notika/js/main.js"></script>
-</body>
-
+        
 </html>
