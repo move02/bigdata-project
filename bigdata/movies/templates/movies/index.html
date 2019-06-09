@@ -36,7 +36,7 @@ d3.csv("{% url 'movies:genres_count' %}", function(error, data) {
 
     // Add Y axis
     var y = d3.scaleLinear()
-    .domain([0, 500])
+    .domain([0, 300])
     .range([ height, 0]);
     svg.append("g")
     .call(d3.axisLeft(y));
@@ -54,4 +54,22 @@ d3.csv("{% url 'movies:genres_count' %}", function(error, data) {
 
 })
 </script>
+
+<hr>
+
+<div class="row">
+{% for movie in movies %}
+    <div class="col-md-3">
+      <div class="card" style="width: 18rem; margin-bottom:20px">
+          <img src="https://image.tmdb.org/t/p/w500{{movie.poster}}" class="card-img-top" alt="..." width="286px" height="386px">
+          <div class="card-body">
+              <h5 class="card-title">{{movie.title}}</h5>
+              <p class="card-text">{{movie.overview | truncatechars:25}}</p>
+              <a href="#" class="btn btn-primary">Go somewhere</a>
+          </div>
+      </div>
+    </div>
+<br>
+{% endfor %}
+</div>
 {% endblock %}

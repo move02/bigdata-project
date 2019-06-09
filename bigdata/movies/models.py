@@ -2,6 +2,7 @@
 from djongo import models
 from django.conf import settings as djangoSettings
 import os,csv
+import pymongo
 # Create your models here.
 
 class ProductionCompany(models.Model):
@@ -34,6 +35,15 @@ class Genre(models.Model):
 
     def __str__(self):
         return self.name
+
+    def list_of_genres():
+        conn = pymongo.MongoClient('localhost', 27017)
+
+        db = conn.get_database('moviedb')
+        collection = db.get_collection('movies_genre')
+        genre_list = collection.distinct('name')
+
+        return genre_list
 
     def count_genres(self, queryset):
         genres = []
@@ -104,6 +114,41 @@ class Movie(models.Model):
 
 class User(models.Model):
     name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
+    def set_preference_tag(self):
+        genre_list = Genre.list_of_genres()
+        genre_dict = {}
+
+        for g in genre_list:
+            genre_dict[g] = []
+        
+        for rating in self.ratings(manager="objects").all():
+            mov = Movie.objects.get(id=rating.movie_id)
+            genres = mov.genres(manager="objects").all()
+            for genre in genres:
+                genre_dict[genre.name].append(rating.rating)
+        
+        for k,v in genre_dict.items():
+            if len(v) > 0:
+                avg = sum(v) / len(v)
+                pref = self.preferences(manager="objects").create(genre=k, avg_rating=avg)
+                pref.save()
+
+        # self.preferences = genre_json
+        # self.save()
+
+
+class PrefTag(models.Model):
+    genre = models.CharField(max_length=200)
+    avg_rating = models.FloatField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, related_name="preferences")
+
+    def __str__(self):
+        return self.genre + str(self.avg_rating)
+
 
 class Rating(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, default=None, related_name="ratings")

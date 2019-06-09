@@ -8,11 +8,12 @@ import mimetypes
 
 # from .forms import PostForm, CommentForm
 
-def index(request):        
-    return render(request, 'index.html')
 
-def login(request):        
-    return render(request, 'login-register.html')
+def index(request):
+    movies = Movie.objects.filter(release_date__gte=datetime.date(2017,5,1)) 
+    return render(request, 'movies/index.html',{
+        'movies' : movies
+    })
 
 def genres_count(request):
     filename = '/Users/move0/dev/django/bigdata/bigdata/static/movies/data/recent_genre.csv'
