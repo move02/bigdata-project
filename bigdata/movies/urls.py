@@ -1,12 +1,14 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 app_name = 'movies'
 urlpatterns = [
-    path('', views.index),
-    path('login', views.login, name='login'),
+    path('', views.index, name='index'),
+    path('login_register', views.login_register, name='login_register'),
     path('api/genres_count/<int:year>', views.genres_count, name='genres_count'),
-    path('loginActive', views.genres_count, name='loginActive'),
-
-    # path('movies/', include('movies.urls'))
+    path('signin', views.signin, name='signin'),
+    path('signout', views.signout, name='signout'),
+] 
+urlpatterns+=[
+    path('', include('django.contrib.auth.urls')),
 ]

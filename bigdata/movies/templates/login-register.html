@@ -105,23 +105,25 @@
                         var id,pw;
                         id=$("#id").val();
                         pw=$("#pw").val();
-                        alert('버튼이 눌렸습니다.'+id+pw);
-                        var url="/loginActive"; 
+                        // alert('버튼이 눌렸습니다.'+id+pw);
+                        var url="/movies/signin"; 
                         $.ajax({      
                             type:"POST",  
                             url:url,      
-                            data:{"name":id,"pw":pw}, 
+                            data:{"name":id,"password":pw}, 
                             //반환된 결과(Data)기준 로그인 성공/실패 판정
-                            success: function(data){
+                            success: function(response){
                                 // !!! 이부분에 결과처리
-                                /*
-                                if (data.length){ 
-                                    location.href='/'; 
+                                if (response['result'] == 'Success'){ 
+                                    // alert('로그인 성공'+id+pw);
+                                    window.location.href = '/movies/';
                                 }else{
+                                  // Vue에서 alert가 동작 안되네요ㅜ.ㅜ
                                     login_app.alertmsg = "아이디나 비밀번호가 잘못되었습니다."; // AJAX안에서는 this를 쓰지 못하므로, app이름으로 접근함
                                     login_app.alertcolor = "alert-danger";
+                                    // 기본 alert만 동작됨.
+                                    alert("아이디나 비밀번호가 잘못되었습니다.")
                                 }
-                                */
                             }
                             ,   
                             error:function(e){  
