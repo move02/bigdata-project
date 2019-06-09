@@ -9,7 +9,7 @@ import mimetypes
 # from .forms import PostForm, CommentForm
 
 def index(request):
-    movies = Movie.objects.filter(release_date__gte=datetime.date(2017,5,1))        
+    movies = Movie.objects.filter(release_date__gte=datetime.date(2017,5,1)) 
     return render(request, 'movies/index.html',{
         'movies' : movies
     })
