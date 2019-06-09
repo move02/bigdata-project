@@ -88,3 +88,6 @@ db.sqlite3
 *.csv
 import.py
 import_rating.py
+/.idea/vcs.xml
+import_user.py
+staticfiles
