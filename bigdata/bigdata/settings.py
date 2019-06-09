@@ -70,6 +70,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'bigdata.wsgi.application'
 
+AUTH_USER_MODEL = 'movies.User'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases

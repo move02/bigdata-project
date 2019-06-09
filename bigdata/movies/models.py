@@ -3,6 +3,10 @@ from djongo import models
 from django.conf import settings as djangoSettings
 import os,csv
 import pymongo
+from django.contrib.auth.models import AbstractUser
+from .managers import CustomUserManager
+import datetime
+
 # Create your models here.
 
 class ProductionCompany(models.Model):
@@ -45,41 +49,6 @@ class Genre(models.Model):
 
         return genre_list
 
-    def count_genres(self, queryset):
-        genres = []
-
-        for movie in queryset:
-            m_genres = movie.genres(manager='objects').all()
-            for genre in m_genres:
-                if len(genres) == 0:
-                    new_one = {'genre' : genre.name, 'count' : 1}
-                    genres.append(new_one)
-                    print(genre.name + " Added // genres len : " + str(len(genres)))
-                else:
-                    length = len(genres)
-                    count = 1
-                    for g in genres:
-                        if genre.name == g['genre']:
-                            g['count'] += 1  
-                            print(genre.name + " + 1")
-                            break
-                        elif count == length:
-                            new_one = {'genre' : genre.name, 'count' : 1}
-                            genres.append(new_one)
-                            print(genre.name + " Added // genres len : " + str(len(genres)))
-                            break
-                        else:
-                            count+=1
-        import csv    
-        f = open('/Users/move0/dev/django/bigdata/bigdata/static/movies/data/recent_genre.csv', 'w', encoding='utf-8', newline='')
-        wr = csv.writer(f)
-        wr.writerow(['name', 'count'])
-        for line in genres:
-            newline = [line['genre'], line['count']]
-            wr.writerow(newline)
-        f.close()
-        return
-
 class Collection(models.Model):    
     collection_id = models.IntegerField(default=0)
     name = models.CharField(max_length=200)
@@ -112,8 +81,51 @@ class Movie(models.Model):
     def __str__(self):
         return self.title
 
-class User(models.Model):
-    name = models.CharField(max_length=200)
+    def count_genres(year):
+        genres = []
+        queryset = Movie.objects.filter(release_date__gte=datetime.date(year, 1, 1),
+                                release_date__lte=datetime.date(year, 12, 31))
+        
+        for movie in queryset:
+            m_genres = movie.genres(manager='objects').all()
+            for genre in m_genres:
+                if len(genres) == 0:
+                    new_one = {'genre' : genre.name, 'count' : 1}
+                    genres.append(new_one)
+                    print(genre.name + " Added // genres len : " + str(len(genres)))
+                else:
+                    length = len(genres)
+                    count = 1
+                    for g in genres:
+                        if genre.name == g['genre']:
+                            g['count'] += 1  
+                            print(genre.name + " + 1")
+                            break
+                        elif count == length:
+                            new_one = {'genre' : genre.name, 'count' : 1}
+                            genres.append(new_one)
+                            print(genre.name + " Added // genres len : " + str(len(genres)))
+                            break
+                        else:
+                            count+=1
+        import csv    
+        f = open(djangoSettings.STATICFILES_DIRS[0] + '/movies/data/genre_{}.csv'.format(year), 'w', encoding='utf-8', newline='')
+        wr = csv.writer(f)
+        wr.writerow(['name', 'count'])
+        for line in genres:
+            newline = [line['genre'], line['count']]
+            wr.writerow(newline)
+        f.close()
+        return
+
+class User(AbstractUser):
+    username = None
+    name = models.CharField(max_length=200, unique=True)
+
+    USERNAME_FIELD = 'name'
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
 
     def __str__(self):
         return self.name

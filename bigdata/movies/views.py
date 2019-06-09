@@ -5,8 +5,8 @@ from .models import Movie, Genre
 from django.db import connections
 from django.db.models import Count
 import mimetypes
-
-# from .forms import PostForm, CommentForm
+from django.contrib.auth import login, authenticate
+from bigdata import settings
 
 
 def index(request):
@@ -15,7 +15,23 @@ def index(request):
         'movies' : movies
     })
 
-def genres_count(request):
-    filename = '/Users/move0/dev/django/bigdata/bigdata/static/movies/data/recent_genre.csv'
+def genres_count(request, year):
+    filename = settings.STATICFILES_DIRS[0] + '/movies/data/genre_{}.csv'.format(year)
     fsock = open(filename,"rb")
     return HttpResponse(fsock, content_type=mimetypes.guess_type(filename)[0]) 
+
+def login(request):        
+    return render(request, 'login-register.html')
+
+def signin(request):
+    if request.method == "POST":
+        name = request.POST['name']
+        password = request.POST['password']
+        user = authenticate(name = name, password = password)
+        if user is not None:
+            login(request, user)
+            return redirect('index')
+        else:
+            return HttpResponse('로그인 실패. 다시 시도 해보세요.')
+    else:
+        return render(request, 'login-register.html')

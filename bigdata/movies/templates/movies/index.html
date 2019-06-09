@@ -21,7 +21,8 @@ var svg = d3.select("#my_dataviz")
           "translate(" + margin.left + "," + margin.top + ")");
 
 // Parse the Data
-d3.csv("{% url 'movies:genres_count' %}", function(error, data) {
+d3.csv("{% url 'movies:genres_count' 2000 %}", function(error, data) {
+    var max = d3.max(data, function(d) { return +d.count+50;});
     // X axis
     var x = d3.scaleBand()
     .range([ 0, width ])
@@ -36,7 +37,7 @@ d3.csv("{% url 'movies:genres_count' %}", function(error, data) {
 
     // Add Y axis
     var y = d3.scaleLinear()
-    .domain([0, 300])
+    .domain([0, max])
     .range([ height, 0]);
     svg.append("g")
     .call(d3.axisLeft(y));
