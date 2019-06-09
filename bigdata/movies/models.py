@@ -46,7 +46,6 @@ class Genre(models.Model):
         db = conn.get_database('moviedb')
         collection = db.get_collection('movies_genre')
         genre_list = collection.distinct('name')
-
         return genre_list
 
 class Collection(models.Model):    
@@ -117,7 +116,7 @@ class Movie(models.Model):
             wr.writerow(newline)
         f.close()
         return
-
+    
 class User(AbstractUser):
     username = None
     name = models.CharField(max_length=200, unique=True)
@@ -163,3 +162,14 @@ class Rating(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, default=None, related_name="ratings")
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, related_name="ratings")
     rating = models.FloatField(default=0)
+
+# 그룹에 해당하는 유저 
+class group_users(models.Model):
+    user_id = models.IntegerField()
+    group_id = models.IntegerField()
+    
+# 각 그룹의 정보 (현재는 임의의 이름만 들어가있음)
+class group_info(models.Model):
+    name = models.CharField(blank=True, max_length=200)
+    def __str__(self):
+        return self.name
