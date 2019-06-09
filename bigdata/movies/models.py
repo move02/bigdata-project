@@ -84,7 +84,7 @@ class Movie(models.Model):
     def count_genres(year):
         genres = []
         queryset = Movie.objects.filter(release_date__gte=datetime.date(year, 1, 1),
-                                release_date__lte=datetime.date(year, 12, 31))
+                                release_date__lte=datetime.date(year+9, 12, 31))
         
         for movie in queryset:
             m_genres = movie.genres(manager='objects').all()
@@ -148,9 +148,6 @@ class User(AbstractUser):
                 avg = sum(v) / len(v)
                 pref = self.preferences(manager="objects").create(genre=k, avg_rating=avg)
                 pref.save()
-
-        # self.preferences = genre_json
-        # self.save()
 
 
 class PrefTag(models.Model):
