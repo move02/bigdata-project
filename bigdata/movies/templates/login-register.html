@@ -1,0 +1,270 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Login Register | Notika - Notika Admin Template</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- favicon
+		============================================ -->
+    <link rel="shortcut icon" type="image/x-icon" href="/static/notika/img/favicon.ico">
+    <!-- Google Fonts
+		============================================ -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,900" rel="stylesheet">
+    <!-- Bootstrap CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/bootstrap.min.css">
+    <!-- font awesome CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/font-awesome.min.css">
+    <!-- owl.carousel CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/owl.carousel.css">
+    <link rel="stylesheet" href="/static/notika/css/owl.theme.css">
+    <link rel="stylesheet" href="/static/notika/css/owl.transitions.css">
+    <!-- animate CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/animate.css">
+    <!-- normalize CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/normalize.css">
+    <!-- mCustomScrollbar CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/scrollbar/jquery.mCustomScrollbar.min.css">
+    <!-- wave CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/wave/waves.min.css">
+    <!-- Notika icon CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/notika-custom-icon.css">
+    <!-- main CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/main.css">
+    <!-- style CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/style.css">
+    <!-- responsive CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/responsive.css">
+    <!-- modernizr JS
+		============================================ -->
+    <script src="/static/notika/js/vendor/modernizr-2.8.3.min.js"></script>
+    <!--VUE/AJAX 동작 코드 -->  
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+      $(document).ready(function(){
+        // VUE+AJAX : 로그인
+        // 기능1 : LoginActive로 POST를 보내 결과를 받는다.
+        // 기능2 : 로그인 성공/실패를 판단,경고를 띄우거나 리디렉션한다.
+            var login_app = new Vue({
+                  el: '#login_app',
+                  data: {
+                    // 안내 메시지의 기본 상태, 이 값을 실시간으로 바꿈
+                    alertmsg : '이 페이지는 테스트 버전으로 동작 중입니다.',
+                    alertcolor : 'alert-warning'
+                  },
+                 created: function () { // 문서를 불러오면 시작되는 메소드
+                 },
+                methods: { // 일반 메소드
+                    submit: function (event) { // Submit 버튼 클릭으로 호출시
+                     //메소드 내부는 JQuery와 AJAX로 구현
+                        var id,pw;
+                        id=$("#id").val();
+                        pw=$("#pw").val();
+                        alert('버튼이 눌렸습니다.'+id+pw);
+                        var url="/loginActive"; 
+                        $.ajax({      
+                            type:"POST",  
+                            url:url,      
+                            data:{"id":id,"pw":pw}, 
+                            //반환된 결과(Data)기준 로그인 성공/실패 판정
+                            success: function(data){
+                                // !!! 이부분에 결과처리
+                                /*
+                                if (data.length){ 
+                                    location.href='/'; 
+                                }else{
+                                    login_app.alertmsg = "아이디나 비밀번호가 잘못되었습니다."; // AJAX안에서는 this를 쓰지 못하므로, app이름으로 접근함
+                                    login_app.alertcolor = "alert-danger";
+                                }
+                                */
+                            }
+                            ,   
+                            error:function(e){  
+                                alert(e.responseText);  
+                            } 
+                        });
+                    }
+                }
+            })
+    });  
+    </script>
+</head>
+
+<body>
+    <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+    <!-- Login Register area Start-->
+    <div class="login-content">
+        <!-- Login -->
+        <div class="nk-block toggled" id="l-login">
+            <a href="/movies"><img src="/static/notika/img/logo/big_logo.png"></a>
+            <div class="nk-form" id="login_app">
+                <div class="input-group">
+                    <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-support"></i></span>
+                    <div class="nk-int-st">
+                        <input id="id" type="text" class="form-control" placeholder="Username">
+                    </div>
+                </div>
+                <div class="input-group mg-t-15">
+                    <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-edit"></i></span>
+                    <div class="nk-int-st">
+                        <input id="pw" type="password" class="form-control" placeholder="Password">
+                    </div>
+                </div>
+                <div class="fm-checkbox">
+                    <label><input type="checkbox" class="i-checks"> <i></i> Keep me signed in</label>
+                </div>
+                <a v-on:click="submit" class="btn btn-login btn-success btn-float"><i class="notika-icon notika-right-arrow right-arrow-ant"></i></a>
+            </div>
+            <div class="nk-navigation nk-lg-ic">
+                <a href="#" data-ma-action="nk-login-switch" data-ma-block="#l-register"><i class="notika-icon notika-plus-symbol"></i> <span>Register</span></a>
+                <!-- CUSTOM : 비밀번호 찾기 기능 비활성화
+                <a href="#" data-ma-action="nk-login-switch" data-ma-block="#l-forget-password"><i>?</i> <span>Forgot Password</span></a>
+                -->
+            </div>
+        </div>
+
+        <!-- Register -->
+        <div class="nk-block" id="l-register">
+            
+            <img src="/static/notika/img/logo/big_logo.png">
+            <div class="nk-form">
+                <div class="input-group">
+                    <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-support"></i></span>
+                    <div class="nk-int-st">
+                        <input type="text" class="form-control" placeholder="Username">
+                    </div>
+                </div>
+
+                <div class="input-group mg-t-15">
+                    <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-mail"></i></span>
+                    <div class="nk-int-st">
+                        <input type="text" class="form-control" placeholder="Email Address">
+                    </div>
+                </div>
+
+                <div class="input-group mg-t-15">
+                    <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-edit"></i></span>
+                    <div class="nk-int-st">
+                        <input type="password" class="form-control" placeholder="Password">
+                    </div>
+                </div>
+
+                <a href="#l-login" data-ma-action="nk-login-switch" data-ma-block="#l-login" class="btn btn-login btn-success btn-float"><i class="notika-icon notika-right-arrow"></i></a>
+            </div>
+
+            <div class="nk-navigation rg-ic-stl">
+                <a href="#" data-ma-action="nk-login-switch" data-ma-block="#l-login"><i class="notika-icon notika-right-arrow"></i> <span>Sign in</span></a>
+                <!-- CUSTOM : 비밀번호 찾기 기능 비활성화
+                <a href="#" data-ma-action="nk-login-switch" data-ma-block="#l-forget-password"><i>?</i> <span>Forgot Password</span></a>
+            </div>
+        </div>
+
+        <!-- Forgot Password -->
+        <div class="nk-block" id="l-forget-password">
+            <div class="nk-form">
+                <p class="text-left">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eu risus. Curabitur commodo lorem fringilla enim feugiat commodo sed ac lacus.</p>
+
+                <div class="input-group">
+                    <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-mail"></i></span>
+                    <div class="nk-int-st">
+                        <input type="text" class="form-control" placeholder="Email Address">
+                    </div>
+                </div>
+
+                <a href="#l-login" data-ma-action="nk-login-switch" data-ma-block="#l-login" class="btn btn-login btn-success btn-float"><i class="notika-icon notika-right-arrow"></i></a>
+            </div>
+
+            <div class="nk-navigation nk-lg-ic rg-ic-stl">
+                <a href="" data-ma-action="nk-login-switch" data-ma-block="#l-login"><i class="notika-icon notika-right-arrow"></i> <span>Sign in</span></a>
+                <a href="" data-ma-action="nk-login-switch" data-ma-block="#l-register"><i class="notika-icon notika-plus-symbol"></i> <span>Register</span></a>
+            </div>
+        </div>
+    </div>
+    
+</body>
+
+<!-- Login Register area End-->
+    <!-- jquery
+		============================================ -->
+    <script src="/static/notika/js/vendor/jquery-1.12.4.min.js"></script>
+    <!-- bootstrap JS
+		============================================ -->
+    <script src="/static/notika/js/bootstrap.min.js"></script>
+    <!-- wow JS
+		============================================ -->
+    <script src="/static/notika/js/wow.min.js"></script>
+    <!-- price-slider JS
+		============================================ -->
+    <script src="/static/notika/js/jquery-price-slider.js"></script>
+    <!-- owl.carousel JS
+		============================================ -->
+    <script src="/static/notika/js/owl.carousel.min.js"></script>
+    <!-- scrollUp JS
+		============================================ -->
+    <script src="/static/notika/js/jquery.scrollUp.min.js"></script>
+    <!-- meanmenu JS
+		============================================ -->
+    <script src="/static/notika/js/meanmenu/jquery.meanmenu.js"></script>
+    <!-- counterup JS
+		============================================ -->
+    <script src="/static/notika/js/counterup/jquery.counterup.min.js"></script>
+    <script src="/static/notika/js/counterup/waypoints.min.js"></script>
+    <script src="/static/notika/js/counterup/counterup-active.js"></script>
+    <!-- mCustomScrollbar JS
+		============================================ -->
+    <script src="/static/notika/js/scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+    <!-- sparkline JS
+		============================================ -->
+    <script src="/static/notika/js/sparkline/jquery.sparkline.min.js"></script>
+    <script src="/static/notika/js/sparkline/sparkline-active.js"></script>
+    <!-- flot JS
+		============================================ -->
+    <script src="/static/notika/js/flot/jquery.flot.js"></script>
+    <script src="/static/notika/js/flot/jquery.flot.resize.js"></script>
+    <script src="/static/notika/js/flot/flot-active.js"></script>
+    <!-- knob JS
+		============================================ -->
+    <script src="/static/notika/js/knob/jquery.knob.js"></script>
+    <script src="/static/notika/js/knob/jquery.appear.js"></script>
+    <script src="/static/notika/js/knob/knob-active.js"></script>
+    <!--  Chat JS
+		============================================ -->
+    <script src="/static/notika/js/chat/jquery.chat.js"></script>
+    <!--  wave JS
+		============================================ -->
+    <script src="/static/notika/js/wave/waves.min.js"></script>
+    <script src="/static/notika/js/wave/wave-active.js"></script>
+    <!-- icheck JS
+		============================================ -->
+    <script src="/static/notika/js/icheck/icheck.min.js"></script>
+    <script src="/static/notika/js/icheck/icheck-active.js"></script>
+    <!--  todo JS
+		============================================ -->
+    <script src="/static/notika/js/todo/jquery.todo.js"></script>
+    <!-- Login JS
+		============================================ -->
+    <script src="/static/notika/js/login/login-action.js"></script>
+    <!-- plugins JS
+		============================================ -->
+    <script src="/static/notika/js/plugins.js"></script>
+    <!-- main JS
+		============================================ -->
+    <script src="/static/notika/js/main.js"></script>
+        
+</html>
