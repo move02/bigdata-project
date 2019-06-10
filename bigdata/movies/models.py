@@ -118,9 +118,20 @@ class Movie(models.Model):
         f.close()
         return
 
+class Club(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+    desc = models.TextField(default=None)
+
+    def __str__(self):
+        return self.name
+
+    def has_member(user):
+        return self.users(manager="object").get(pk=user.pk).exists()
+
 class User(AbstractUser):
     username = None
     name = models.CharField(max_length=200, unique=True)
+    club = models.ForeignKey(Club, on_delete=models.SET_NULL, null=True, default=None, related_name="users")
 
     USERNAME_FIELD = 'name'
     REQUIRED_FIELDS = []
@@ -149,6 +160,22 @@ class User(AbstractUser):
                 pref = self.preferences(manager="objects").create(genre=k, avg_rating=avg)
                 pref.save()
 
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    club = models.ForeignKey(Club, on_delete=models.SET_NULL, null=True, default=None, related_name="posts")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
+    
+    def __str__(self):
+        return self.title
+
+class Comment(models.Model):
+    content = models.TextField()
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
+
+    def __str__(self):
+        return self.content
 
 class PrefTag(models.Model):
     genre = models.CharField(max_length=200)
