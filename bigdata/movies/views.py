@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 import datetime, pymongo, json
-from .models import Movie, Genre
+from .models import Movie, Genre, User
 from django.db import connections
 from django.db.models import Count
 import mimetypes
@@ -48,3 +48,24 @@ def signin(request):
 def signout(request):
     logout(request)
     return redirect('/movies/')
+
+def signup(request):
+    if request.method == "POST":
+        name = request.POST['name']
+        email = request.POST['email']
+        password = request.POST['password']
+        user = authenticate(name = name, password = password)
+
+        response_data = {}
+        if user is None:
+            user = User.objects.create_user(name = name, password = password, email=email)
+            login(request, user)                                                                                       
+            response_data['result'] = 'Success'
+            response_data['message'] = 'You"re logged in'
+        else:                                                          
+            response_data['result'] = 'Failed'
+            response_data['message'] = '이미 존재하는 Name 임.'
+        
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    else:
+        return render(request, 'login-register.html')
