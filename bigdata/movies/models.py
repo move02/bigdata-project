@@ -118,9 +118,20 @@ class Movie(models.Model):
         f.close()
         return
 
+class Club(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+    desc = models.TextField(default=None)
+
+    def __str__(self):
+        return self.name
+
+    def has_member(user):
+        return self.users(manager="object").get(pk=user.pk).exists()
+
 class User(AbstractUser):
     username = None
     name = models.CharField(max_length=200, unique=True)
+    club = models.ForeignKey(Club, on_delete=models.SET_NULL, null=True, default=None, related_name="users")
 
     USERNAME_FIELD = 'name'
     REQUIRED_FIELDS = []

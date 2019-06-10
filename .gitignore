@@ -87,6 +87,8 @@ local_settings.py
 db.sqlite3
 import.py
 import_rating.py
-/.idea/vcs.xml
+/.idea/
 import_user.py
 staticfiles
+
+*.zip
