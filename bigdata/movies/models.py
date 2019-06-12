@@ -1,4 +1,5 @@
 # from django.db import models
+# -*- coding: utf-8 -*-
 from djongo import models
 from django.conf import settings as djangoSettings
 import os,csv
@@ -6,6 +7,10 @@ import pymongo
 from django.contrib.auth.models import AbstractUser
 from .managers import CustomUserManager
 import datetime
+import numpy as np
+from sklearn.cluster import KMeans
+
+
 
 # Create your models here.
 
@@ -125,8 +130,64 @@ class Club(models.Model):
     def __str__(self):
         return self.name
 
-    def has_member(user):
+    def has_member(self, user):
         return self.users(manager="object").get(pk=user.pk).exists()
+
+#그룹별 선호도
+    def pf_movie():
+        save = open('pfmovie.txt','w')
+        numarrDic = {}
+        grouppfDic = {}
+        groupnum = 200
+
+        for i in range(200):
+            tempdic = {}
+            numdic = {}
+            numdicArr=[]
+
+
+            print("group : ", i)
+            for us in User.objects.filter(club_id=i):
+
+                for rat in Rating.objects.filter(user_id=us.id):
+                    if rat.movie_id in tempdic.keys():
+                        tempdic[rat.movie_id] = tempdic[rat.movie_id] + rat.rating
+                        numdic[rat.movie_id] = numdic[rat.movie_id] + 1
+                    else:
+                        tempdic[rat.movie_id] = rat.rating
+                        numdic[rat.movie_id] = 1
+
+            for key in tempdic.keys():
+                tempdic[key] = tempdic[key]/numdic[key]
+
+            #그룹별 영화 평점 평균 정보
+            grouppfDic[i] = tempdic
+            numarrDic[i] = numdic
+
+        clubBestmv={}
+
+        #최대 평점 영화 구하기
+        for gid in grouppfDic.keys():
+            print(gid)
+            tempBV = []
+            for mvid in grouppfDic[gid].keys(): #영화 id
+                if numarrDic[gid][mvid] >= 5 and grouppfDic[gid][mvid] >= 4.5:
+                    mv = Movie.objects.get(id=mvid)
+                    tempBV.append(mvid)
+                elif numarrDic[gid][mvid] >= 2 and grouppfDic[gid][mvid] >= 5:
+                    mv = Movie.objects.get(id=mvid)
+                    #print(gid, ':', mv.title)
+                    tempBV.append(mvid)
+
+            clubBestmv[gid] = tempBV
+
+        #값  확인
+        # for grid in clubBestmv.keys():
+        #     for mvid2 in clubBestmv[grid]:
+        #         mv = Movie.objects.get(id=mvid2)
+        #         print(grid,' : ',mv.title)
+
+
 
 class User(AbstractUser):
     username = None
@@ -154,11 +215,103 @@ class User(AbstractUser):
             for genre in genres:
                 genre_dict[genre.name].append(rating.rating)
         
-        for k,v in genre_dict.items():
+        for k, v in genre_dict.items():
             if len(v) > 0:
                 avg = sum(v) / len(v)
                 pref = self.preferences(manager="objects").create(genre=k, avg_rating=avg)
                 pref.save()
+
+#수정 중
+    def signup_club(userid, pre):
+
+        kmeans = User.mk_club()
+        #pre = [3.1, 2.1, 3.1, 2.1, 3.1, 2.1, 3.1, 2.1, 3.1, 2.1, 3.1, 2.1, 3.1, 2.1, 3.1, 2.1, 3.1, 2.1, 3.1, 2.1]
+        X2 = np.array(pre)
+        print(userid, "의 그룹정보 : ", kmeans.predict(X2.reshape(1, -1))[0])
+
+        #해당 유저의 그룹정보 return
+        return kmeans.predict(X2.reshape(1, -1))[0]
+
+
+
+    def mk_club():
+        genList = ['Animation', 'Comedy', 'Family', 'Adventure', 'Fantasy', 'Romance', 'Drama', 'Action', 'Crime',
+                   'Thriller', 'Horror', 'History', 'Science Fiction', 'Mystery', 'War', 'Foreign', 'Music',
+                   'Documentary', 'Western', 'TV Movie', 'Odyssey Media', 'Pulser Productions', 'Rogue State',
+                   'The Cartel']
+
+        user_prfList = []
+        useridList = []
+        usergroupDic={}
+        userprfDic={}
+        knum = 200
+
+        #k수(그룹수)
+        clubUserlist = [[] for _ in range(0, knum)]
+
+        #29063
+        for userid in range(1, 29063):
+            prfList = [2.0 for _ in range(0, 20)]
+            for k in PrefTag.objects.filter(user_id=userid):
+                prfList[genList.index(k.genre)] = k.avg_rating
+            user_prfList.append(prfList)
+            useridList.append(userid)
+            userprfDic[userid] = prfList
+
+        X = np.array(user_prfList)
+
+        # 클러스터링 하는 부분
+        kmeans = KMeans(n_clusters=knum)
+        kmeans.fit(X)
+
+        for i in range(len(useridList)):
+            # dic에 id별 그룹 정보 저장
+            usergroupDic[useridList[i]] = kmeans.labels_[i]
+            clubUserlist[kmeans.labels_[i]].append(useridList[i])
+
+        #그룹이름 - 선호 장르 3개
+        groupprfGenreDIc={}
+        groupnum = 0
+        for oneClubUsers in clubUserlist:
+            tempprfs = [0.0 for _ in range(0, 20)]
+            cnt = len(oneClubUsers)
+            for usr in oneClubUsers:
+                #그룹에 있는 유저들의 평점 합
+                for i in range(0, len(tempprfs)):
+                    tempprfs[i] = tempprfs[i] + userprfDic[usr][i]
+
+            #평균 계산
+            for t in range(0, len(tempprfs)):
+                tempprfs[t] = tempprfs[t] / cnt
+
+            groupPrfGenre = []
+            desc = ""
+            for i in range(3):
+                prfindex = tempprfs.index(max(tempprfs))
+                groupPrfGenre.append(genList[prfindex])
+                if i == 2:
+                    desc = desc + genList[prfindex]
+                else:
+                    desc = desc + genList[prfindex] + ', '
+                tempprfs[prfindex] = 0
+
+            #클럽 정보 저장
+            groupname = 'group' + str(groupnum)
+            club, created = Club.objects.update_or_create(id=groupnum, defaults={'name': groupname, 'desc': desc})
+            groupprfGenreDIc[groupnum] = groupPrfGenre
+            groupnum = groupnum + 1
+
+        #user-club 저장
+        for i in range(len(useridList)):
+            u = User.objects.get(id=useridList[i])
+            u.club_id = Club.objects.get(id=kmeans.labels_[i])
+            u.save()
+
+        #클러스터링 모델 return
+        return kmeans
+
+
+
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
