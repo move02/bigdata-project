@@ -126,9 +126,11 @@ class Movie(models.Model):
 class Club(models.Model):
     name = models.CharField(max_length=200, unique=True)
     desc = models.TextField(default=None)
+    recommended = models.ManyToManyField(Movie)
 
     def __str__(self):
         return self.name
+<<<<<<< HEAD
 
     def has_member(self, user):
         return self.users(manager="object").get(pk=user.pk).exists()
@@ -189,6 +191,12 @@ class Club(models.Model):
 
 
 
+=======
+    
+    def has_member(self, user):
+        return self.users.filter(id=user.pk).exists()
+    
+>>>>>>> 1a8ca5a13af35b3fb987895e5e3f8f2da9fe97f4
 class User(AbstractUser):
     username = None
     name = models.CharField(max_length=200, unique=True)

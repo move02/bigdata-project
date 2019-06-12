@@ -3,19 +3,23 @@
             <div class="row">
                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                     <div class="logo-area">
-                        <a href="#"><img src="/static/notika/img/logo/logo.png" alt="" /></a>
+                        <a href="/movies/"><img src="/static/notika/img/logo/logo.png" alt="" /></a>
                     </div>
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
                     <div class="header-top-menu">
                         <ul class="nav navbar-nav notika-top-nav">
-                            {% if user.is_active %}
-                            <li class="nav-item"><a href="#"> <span class="glyphicon glyphicon-heart"></span> {{user.name}}</a></li>
-                            <li class="nav-item"><a href="{% url 'movies:signout' %}">Logout</a></li>
+                            {% if user.is_active%}
+                            <li class="nav-item"><a href="#"> <span class="glyphicon notika-icon notika-support"></span> <small>Welcome, <b>{{user.name}}</b></small>&nbsp;&nbsp;&nbsp;</a></li>
+                            <li class="nav-item">
+                            <div class="btn-top">
+                                        <button onclick = "location.href = '/movies/signout' " class="btn btn-amber amber-icon-notika waves-effect"><i class="notika-icon notika-left-arrow"></i> Logout</button>
+                                    </div>
+                            </li>
                             {% else %}
                             <li class="nav-item">
                                 <div class="btn-top">
-                                    <button onclick = "location.href = '/movies/login_register' " class="btn btn-amber amber-icon-notika waves-effect"><i class="notika-icon notika-down-arrow"></i> SignIn/Register</button>
+                                    <button onclick = "location.href = '/movies/login_register' " class="btn btn-amber amber-icon-notika waves-effect"><i class="notika-icon notika-right-arrow"></i> SignIn/Register</button>
                                 </div>
                             </li>
                             <li class="nav-item">
