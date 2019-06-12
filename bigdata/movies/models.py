@@ -130,11 +130,6 @@ class Club(models.Model):
 
     def __str__(self):
         return self.name
-<<<<<<< HEAD
-
-    def has_member(self, user):
-        return self.users(manager="object").get(pk=user.pk).exists()
-
 #그룹별 선호도
     def pf_movie():
         save = open('pfmovie.txt','w')
@@ -191,12 +186,10 @@ class Club(models.Model):
 
 
 
-=======
     
     def has_member(self, user):
         return self.users.filter(id=user.pk).exists()
     
->>>>>>> 1a8ca5a13af35b3fb987895e5e3f8f2da9fe97f4
 class User(AbstractUser):
     username = None
     name = models.CharField(max_length=200, unique=True)
