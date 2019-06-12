@@ -11,7 +11,6 @@ import numpy as np
 from sklearn.cluster import KMeans
 
 
-
 # Create your models here.
 
 class ProductionCompany(models.Model):
@@ -131,7 +130,6 @@ class Club(models.Model):
     def __str__(self):
         return self.name
 
-
     def has_member(self, user):
         return self.users(manager="object").get(pk=user.pk).exists()
 
@@ -191,12 +189,11 @@ class Club(models.Model):
                 #print(grid,' : ',mv.title)
                 cl.save()
 
-
-
-
+    
     def has_member(self, user):
         return self.users.filter(id=user.pk).exists()
-
+    
+    
 class User(AbstractUser):
     username = None
     name = models.CharField(max_length=200, unique=True)

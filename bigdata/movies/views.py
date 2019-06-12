@@ -9,10 +9,20 @@ import mimetypes
 from django.contrib.auth import login, authenticate, logout
 from bigdata import settings
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def index(request):
-    movies = Movie.objects.filter(release_date__gte=datetime.date(2017,5,1)) 
+    movies = Movie.objects.filter(release_date__gte=datetime.date(2017,5,1))
+    usercount = User.objects.all().count
+    clubcount = Club.objects.all().count
+    posts = Post.objects.all()
+    moviecount = Movie.objects.all().count
     return render(request, 'movies/index.html',{
+        'movies' : movies,
+        'moviecount' : moviecount,
+        'usercount' : usercount,
+        'clubcount' : clubcount,
+        'posts' : posts,
         'movies' : movies
     })
 
@@ -123,7 +133,7 @@ def commentsubmit(request):
 
 def myclub(request):    
     currentuser = User.objects.filter(id=request.user.id)
-    #print(currentuser.club_id) ??????
+    #print(currentuser.club)
     response_data = {}
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
@@ -137,4 +147,45 @@ def clubmember(request):
         'club' : resultclub,
         'usercount' : usercount,
         'members':resultmembers
+    })
+
+def movielist(request):
+    movies = Movie.objects.all().order_by('-release_date')
+    moviecount = movies.count
+    page = request.GET.get('page', 1)
+    paginator = Paginator(movies, 18)
+    try:
+        currentmovies = paginator.page(page)
+    except PageNotAnInteger:
+        currentmovies = paginator.page(1)
+    except EmptyPage:
+        currentmovies = paginator.page(paginator.num_pages)
+
+    return render(request, 'movies/movielist.html', { 
+        'movies': currentmovies,
+        'moviecount' : moviecount
+    })
+
+def movieview(request):
+    getmovieid = request.GET['id']
+    prarmmovie = Movie.objects.filter(id=getmovieid)
+    return render(request, 'movies/movieview.html', { 
+        'movie' : prarmmovie
+    })
+
+def toprated(request):
+    movies = Movie.objects.order_by('-vote_count','-vote_avg')
+    moviecount = movies.count
+    page = request.GET.get('page', 1)
+    paginator = Paginator(movies, 18)
+    try:
+        currentmovies = paginator.page(page)
+    except PageNotAnInteger:
+        currentmovies = paginator.page(1)
+    except EmptyPage:
+        currentmovies = paginator.page(paginator.num_pages)
+
+    return render(request, 'movies/toprated.html', { 
+        'movies': currentmovies,
+        'moviecount' : moviecount
     })
