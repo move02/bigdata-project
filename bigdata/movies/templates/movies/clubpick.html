@@ -1,0 +1,302 @@
+<!doctype html>
+<html class="no-js" lang="">
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Dashboard One | Notika - Notika Admin Template</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- favicon
+		============================================ -->
+    <link rel="shortcut icon" type="image/x-icon" href="/static/notika/img/favicon.ico">
+    <!-- Google Fonts
+		============================================ -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,900" rel="stylesheet">
+    <!-- Bootstrap CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/bootstrap.min.css">
+    <!-- Bootstrap CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/font-awesome.min.css">
+    <!-- owl.carousel CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/owl.carousel.css">
+    <link rel="stylesheet" href="/static/notika/css/owl.theme.css">
+    <link rel="stylesheet" href="/static/notika/css/owl.transitions.css">
+    <!-- meanmenu CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/meanmenu/meanmenu.min.css">
+    <!-- animate CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/animate.css">
+    <!-- normalize CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/normalize.css">
+    <!-- mCustomScrollbar CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/scrollbar/jquery.mCustomScrollbar.min.css">
+    <!-- jvectormap CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/jvectormap/jquery-jvectormap-2.0.3.css">
+    <!-- notika icon CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/notika-custom-icon.css">
+    <!-- wave CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/wave/waves.min.css">
+    <!-- main CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/main.css">
+    <!-- style CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/style.css">
+    <!-- responsive CSS
+		============================================ -->
+    <link rel="stylesheet" href="/static/notika/css/responsive.css">
+    <!-- modernizr JS
+		============================================ -->
+    <script src="/static/notika/js/vendor/modernizr-2.8.3.min.js"></script>
+    <!-- VUE/Jquery
+		============================================ -->
+    <script src="{% static 'movies/js/d3.js' %}"></script> 
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        $(document).ready(function(){
+            
+        });
+    </script>
+</head>
+
+<body>
+
+    <!-- Start Header Top Area -->
+    {% include 'common/header.html' %}
+    <!-- End Header Top Area -->
+    <!-- Mobile Menu start -->
+    {% include 'common/topmenu.html' %}
+    <!-- Main Menu area End-->
+    <!-- Start Status area -->
+    <div class="notika-status-area">
+        <div class="container">
+          <h5>Club</h5>
+          <p id="club_selected">Select club ID</p>
+          <div>
+              <select name="club" id="club" class="selectpicker clubpicker">
+                  {% for i in ran %}
+                    <option value="{{ i }}">{{ i }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+
+
+            <!-- Create a div where the graph will take place -->
+            <div id="my_dataviz"></div>
+
+            <script>
+            $('#club').change(function() {
+                var data = "";
+                var club = document.getElementById("club");
+                $.ajax({
+                    data : $(this).val(),
+                    async: false,
+                    success : function(response) {
+                      document.getElementById("my_dataviz").innerHTML = "";
+                      var club_id = club.value;
+                      document.getElementById("club_selected").innerHTML = club_id;
+                      draw_graph(club_id);
+                    },
+                    error: function() {
+                        alert('Error occured');
+                    }
+                });
+            });
+
+            function draw_graph(club_id){
+                // set the dimensions and margins of the graph
+                var margin = {top: 10, right: 30, bottom: 30, left: 60},
+                    width = 460 - margin.left - margin.right,
+                    height = 450 - margin.top - margin.bottom;
+
+                // append the svg object to the body of the page
+                var svg = d3.select("#my_dataviz")
+                .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                    .attr("transform",
+                        "translate(" + margin.left + "," + margin.top + ")");
+
+                //Read the data
+                var data_url = "{% url 'movies:clubpick_api' club_id=11 %}".replace(/11/, club_id);
+                d3.csv(data_url, function(data) {
+                    var max = d3.max(data, function(d) { return +d.movie;});
+                    // Add X axis
+                    var x = d3.scaleLinear()
+                        .domain([0, max])
+                        .range([ 0, width ]);
+                    svg.append("g")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(d3.axisBottom(x));
+
+                    // Add Y axis
+                    var y = d3.scaleLinear()
+                        .domain([0, 5.0])
+                        .range([ height, 0]);
+                    svg.append("g")
+                        .call(d3.axisLeft(y));
+
+                    // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+                    // Its opacity is set to 0: we don't see it by default.
+                    var tooltip = d3.select("#my_dataviz")
+                        .append("div")
+                        .style("opacity", 0)
+                        .attr("class", "tooltip")
+                        .style("background-color", "white")
+                        .style("border", "solid")
+                        .style("border-width", "1px")
+                        .style("border-radius", "5px")
+                        .style("padding", "10px")
+
+
+
+                    // A function that change this tooltip when the user hover a point.
+                    // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+                    var mouseover = function(d) {
+                        tooltip
+                        .style("opacity", 1)
+                    }
+
+                    var mousemove = function(d) {
+                        tooltip
+                        .html("Club about : {{ clubs.i.desc }}")
+                        .style("left", (d3.mouse(this)[0]+90) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
+                        .style("top", (d3.mouse(this)[1]) + "px")
+                    }
+
+                    // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+                    var mouseleave = function(d) {
+                        tooltip
+                        .transition()
+                        .duration(200)
+                        .style("opacity", 0)
+                    }
+
+                    // Add dots
+                    svg.append('g')
+                        .selectAll("dot")
+                        .data(data.filter(function(d,i){return i<50})) // the .filter part is just to keep a few dots on the chart, not all of them
+                        .enter()
+                        .append("circle")
+                        .attr("cx", function (d) { return x(d.movie); } )
+                        .attr("cy", function (d) { return y(d.ratings); } )
+                        .attr("r", 7)
+                        .style("fill", "#69b3a2")
+                        .style("opacity", 0.3)
+                        .style("stroke", "white")
+                        .on("mouseover", mouseover )
+                        .on("mousemove", mousemove )
+                        .on("mouseleave", mouseleave )
+
+                })
+            }
+            </script>
+        </div>
+    </div>
+    <!-- 그룹정보 표시 -->
+    <div class="footer-copyright-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="footer-copy-right">
+                        <p>Copyright © 2018 
+. All rights reserved. Template by <a href="https://colorlib.com">Colorlib</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Footer area-->
+    <!-- jquery
+		============================================ -->
+    <script src="/static/notika/js/vendor/jquery-1.12.4.min.js"></script>
+    <!-- bootstrap JS
+		============================================ -->
+    <script src="/static/notika/js/bootstrap.min.js"></script>
+    <!-- wow JS
+		============================================ -->
+    <script src="/static/notika/js/wow.min.js"></script>
+    <!-- price-slider JS
+		============================================ -->
+    <script src="/static/notika/js/jquery-price-slider.js"></script>
+    <!-- owl.carousel JS
+		============================================ -->
+    <script src="/static/notika/js/owl.carousel.min.js"></script>
+    <!-- scrollUp JS
+		============================================ -->
+    <script src="/static/notika/js/jquery.scrollUp.min.js"></script>
+    <!-- meanmenu JS
+		============================================ -->
+    <script src="/static/notika/js/meanmenu/jquery.meanmenu.js"></script>
+    <!-- counterup JS
+		============================================ -->
+    <script src="/static/notika/js/counterup/jquery.counterup.min.js"></script>
+    <script src="/static/notika/js/counterup/waypoints.min.js"></script>
+    <script src="/static/notika/js/counterup/counterup-active.js"></script>
+    <!-- mCustomScrollbar JS
+		============================================ -->
+    <script src="/static/notika/js/scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+    <!-- jvectormap JS
+		============================================ -->
+    <script src="/static/notika/js/jvectormap/jquery-jvectormap-2.0.2.min.js"></script>
+    <script src="/static/notika/js/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="/static/notika/js/jvectormap/jvectormap-active.js"></script>
+    <!-- sparkline JS
+		============================================ -->
+    <script src="/static/notika/js/sparkline/jquery.sparkline.min.js"></script>
+    <script src="/static/notika/js/sparkline/sparkline-active.js"></script>
+    <!-- sparkline JS
+		============================================ -->
+    <script src="/static/notika/js/flot/jquery.flot.js"></script>
+    <script src="/static/notika/js/flot/jquery.flot.resize.js"></script>
+    <script src="/static/notika/js/flot/curvedLines.js"></script>
+    <script src="/static/notika/js/flot/flot-active.js"></script>
+    <!-- knob JS
+		============================================ -->
+    <script src="/static/notika/js/knob/jquery.knob.js"></script>
+    <script src="/static/notika/js/knob/jquery.appear.js"></script>
+    <script src="/static/notika/js/knob/knob-active.js"></script>
+    <!--  wave JS
+		============================================ -->
+    <script src="/static/notika/js/wave/waves.min.js"></script>
+    <script src="/static/notika/js/wave/wave-active.js"></script>
+    <!--  todo JS
+		============================================ -->
+    <script src="/static/notika/js/todo/jquery.todo.js"></script>
+    <!-- plugins JS
+		============================================ -->
+    <script src="/static/notika/js/plugins.js"></script>
+	<!--  Chat JS
+		============================================ -->
+    <script src="/static/notika/js/chat/moment.min.js"></script>
+    <script src="/static/notika/js/chat/jquery.chat.js"></script>
+    <!-- main JS
+		============================================ -->
+    <script src="/static/notika/js/main.js"></script>
+    <!-- honeycombs
+        ============================================ -->
+    <link rel="stylesheet" type="text/css" href="/static/honeycombs/css/honeycombs.css" />
+    <script src="/static/honeycombs/js/jquery.honeycombs.js"></script>
+    <script>
+        $(document).ready(function() {
+        $('.honeycombs').honeycombs({
+            combWidth:180,  
+            margin: 0,		
+            threshold: 3 
+        });
+    });
+    </script>
+</body>
+
+</html>

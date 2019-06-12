@@ -26,10 +26,29 @@ def index(request):
         'movies' : movies
     })
 
+def genre_count_page(request):
+    return render(request, 'movies/genrescount.html')
+
 def genres_count(request, year):
     filename = settings.STATICFILES_DIRS[0] + '/movies/data/genre_{}.csv'.format(year)
     fsock = open(filename,"rb")
     return HttpResponse(fsock, content_type=mimetypes.guess_type(filename)[0]) 
+
+def club_pick(request):
+    movielist = Movie.objects.all()
+    clubs_desc = []
+    clubs = Club.objects.all()[:50]
+    for c in clubs:
+        clubs_desc.append(c.desc)
+
+    ran = range(0,50)
+    return render(request, 'movies/clubpick.html', {'movies' : movielist, 'clubs':clubs_desc, 'ran':ran})
+
+def club_pick_api(request, club_id):
+    filename = settings.STATICFILES_DIRS[0] + '/movies/data/club_{}.csv'.format(club_id)
+    fsock = open(filename,"rb")
+    return HttpResponse(fsock, content_type=mimetypes.guess_type(filename)[0]) 
+
 
 def login_register(request):      
     if not request.user.is_authenticated:

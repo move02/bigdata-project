@@ -17,7 +17,13 @@ urlpatterns = [
     path('clubmember', views.clubmember, name='clubmember'),
     path('movielist', views.movielist, name='movielist'),
     path('movieview', views.movieview, name='movieview'),
-    path('toprated', views.toprated, name='toprated')
+    path('toprated', views.toprated, name='toprated'),
+
+    path('genrescount', views.genre_count_page, name='genrescount'),
+    path('api/genrescount/<int:year>', views.genres_count, name='genrescount_api'),
+
+    path('clubpick', views.club_pick, name='clubpick'),
+    path('api/clubpick/<int:club_id>', views.club_pick_api, name='clubpick_api'),
 ] 
 urlpatterns+=[
     path('', include('django.contrib.auth.urls')),
