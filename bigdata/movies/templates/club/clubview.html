@@ -57,10 +57,109 @@
     <!-- modernizr JS
 		============================================ -->
     <script src="/static/notika/js/vendor/modernizr-2.8.3.min.js"></script>
+
     <!-- VUE/Jquery
 		============================================ -->
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        
+             // Djanog CSRF
+     function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+
+      function csrfSafeMethod(method) {
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+      }
+      $(document).ready(function() {
+        var csrftoken = getCookie('csrftoken');
+        $.ajaxSetup({
+          beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+          }
+        });
+      });
+        
+        
+        $(document).ready(function(){
+            $('#summernote').summernote();
+             var post_app = new Vue({
+                 delimiters: ['${', '}'],
+                 el: '#post_app',
+                 data: {
+                    rawHTML : [],
+                    tempHTML : "",
+                    ismember : Boolean,
+                 },
+                created: function () {
+                    {% for clubpost in clubposts %}
+                        this.tempHTML = ""
+                        {% for clubcomment in clubcomments%}
+                            {% if clubcomment.post_id == clubpost.id %}
+                                this.tempHTML += '<b>{{clubcomment.author_id}}</b>&nbsp;&nbsp;&nbsp;{{clubcomment.content}}<br>'
+                            {%endif%}
+                        {%endfor%}
+                        this.rawHTML.push(this.tempHTML)
+                    {%endfor%}
+                    {% if ismember %}
+                    this.ismember = 1
+                    {% else %}
+                    this.ismember = 1
+                    {% endif %}
+                },
+                methods: {
+                    postsubmit: function (event) { 
+                        var inputtext = $('#summernote').summernote('code');
+                        var userid = {{user.id}};
+                        var clubid = {{club.0.id}};
+                        var url="/movies/postsubmit";
+                        $.ajax({      
+                            type:"POST",  
+                            url:url,   
+                            data:{"inputtext":inputtext,"authorid":userid,"clubid":clubid}, 
+                            success: function(response){
+                                location.reload();
+                            },   
+                            error:function(e){  
+                                alert(e.responseText);  
+                            } 
+                        });
+                    },
+                    commentsubmit: function (input) { 
+                        id = "#comment-input-"+input
+                        content = $(id).val();
+                        console.log(content);
+                        url = "/movies/commentsubmit"; 
+                        $.ajax({      
+                            type:"POST",  
+                            url:url,   
+                            data:{"post_id":input,"content":content,"author_id":{{user.id}}}, 
+                            success: function(response){
+                                location.reload();
+                            },   
+                            error:function(e){  
+                                alert(e.responseText);  
+                            } 
+                        });
+                    }
+                }
+             })
+        })
+    </script>
 </head>
 
 <body>
@@ -80,18 +179,20 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="breadcomb-list">
                         <div class="row">
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
                                 <div class="breadcomb-wp">
                                     <div class="breadcomb-icon">
                                         <i class="notika-icon notika-app"></i>
                                     </div>
                                     <div class="breadcomb-ctn">
-                                        <h2>[GROUP NAME] </h2>
-                                        <p>There are <B>20</B> people in this group</p>
+                                        <h2>{{club.0.name}} </h2>
+                                        <p>
+                                            There are <B>{{usercount}}</B> people in this club
+                                        </p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
                                 <div class="breadcomb-report">
                                     <button data-toggle="tooltip" data-placement="left" title="" class="btn waves-effect" data-original-title="Download Report"><i class="notika-icon notika-sent"></i></button>
                                 </div>
@@ -104,90 +205,79 @@
             <div class="row">
                 <!--좌측 메뉴-->
                 <div class="col-md-3">
-                    <div class="inbox-left-sd">
-						<div class="compose-ml">
-                            <a class="btn waves-effect" href="#">Compose</a>
-                        </div>
-                        <div class="inbox-status">
-                            <ul class="inbox-st-nav inbox-ft">
-                                <li><a href="#"><i class="notika-icon notika-mail"></i> Inbox<span class="pull-right">12</span></a></li>
-                                <li><a href="#"><i class="notika-icon notika-sent"></i> Sent</a></li>
-                                <li><a href="#"><i class="notika-icon notika-draft"></i> Draft</a></li>
-                                <li><a href="#"><i class="notika-icon notika-trash"></i> Trash</a></li>
-                            </ul>
-                        </div>
-                        <hr>
-                        <div class="inbox-status">
-                            <ul class="inbox-st-nav">
-                                <li><a href="#"><i class="notika-icon notika-travel"></i> Travel</a></li>
-                                <li><a href="#"><i class="notika-icon notika-finance"></i> Finance</a></li>
-                                <li><a href="#"><i class="notika-icon notika-social"></i> Social</a></li>
-                                <li><a href="#"><i class="notika-icon notika-promos"></i> Promos</a></li>
-                                <li><a href="#"><i class="notika-icon notika-flag"></i> Updates</a></li>
-                            </ul>
-                        </div>
-                        <hr>
-                        <div class="inbox-status">
-                            <ul class="inbox-st-nav inbox-nav-mg">
-                                <li><a href="#"><i class="notika-icon notika-success"></i> Forum</a></li>
-                                <li><a href="#"><i class="notika-icon notika-chat"></i> Chat</a></li>
-                                <li><a href="#"><i class="notika-icon notika-star"></i> Work</a></li>
-                                <li><a href="#"><i class="notika-icon notika-settings"></i> Settings</a></li>
-                                <li><a href="#"><i class="notika-icon notika-support"></i> Support</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <!--중앙 내용-->
-                <div class="col-md-6">
-                    <div class="breadcomb-list">
-                        
-                        <div class="hd-message-sn">
-                                                <div class="hd-message-img">
-                                                    <img src="/static/notika/img/post/1.jpg" alt="">
-                                                    <center><small>[name]</small></center>
-                                                </div>
-                                                <div class="chat-style">
-                                                    <h5>Title</h5>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                                                </div>
-                       </div>
-                         <div class="hd-message-sn">
-                                                <div class="hd-message-img">
-                                                    <img src="/static/notika/img/post/1.jpg" alt="">
-                                                    <center><small>[name]</small></center>
-                                                </div>
-                                                <div class="chat-style">
-                                                    <h5>Title</h5>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                                                </div>
-                       </div>
-                         <div class="hd-message-sn">
-                                                <div class="hd-message-img">
-                                                    <img src="/static/notika/img/post/1.jpg" alt="">
-                                                    <center><small>[name]</small></center>
-                                                </div>
-                                                <div class="chat-style">
-                                                    <h5>Title</h5>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                                                </div>
-                       </div>
-                        
-                    </div>
-                </div> 
-                <!--우측 메뉴-->
-                <div class="col-md-3">
                     <div class="breadcomb-list" style="padding:0">
                         <div class="right-menu">
                                 <h3>Preferred genre for this group</h3>
-                                <p>[Genre],[Genre],[Genre],[Genre],[Genre],[Genre],[Genre]</p>
+                                <p>{{club.0.desc}}</p>
                         </div>
                         <div class="breadcomb-list">
-                                <h3>Contents</h3>
-                            <i class="notika-icon notika-support"></i>
+                               
                         </div>
                     </div>
+                    <div class="inbox-left-sd">
+                        <div class="inbox-status">
+                             <ul class="inbox-st-nav inbox-ft">
+                                <li><a href="/movies/clubview?id={{club.0.id}}"><i class="notika-icon notika-mail"></i> Posts<span class="pull-right"></span></a></li>
+                                <li><a href="/movies/clubmember?id={{club.0.id}}"><i class="notika-icon notika-sent"></i> Members</a></li>
+                            </ul>
+                        </div>
+                        <hr>
+                    </div>
                 </div>
+                <!--중앙 내용-->
+                <div class="col-md-9">
+                    {% csrf_token %}
+                        <textarea id="summernote"></textarea>
+                    <div class="breadcomb-list " style="padding:0px" id="post_app">
+                        <!-- POST 추가 -->
+                        <div v-if="ismember">
+                            <button v-on:click="postsubmit" class="btn btn-amber amber-icon-notika waves-effect" style="width:100%"><i class="notika-icon notika-chat"></i> &nbsp; New Post</button>
+                        </div>
+                        <button v-else class="btn btn-amber amber-icon-notika waves-effect disabled" style="width:100%"><i class="notika-icon notika-chat"></i> &nbsp; You don't have post permission in this club </button>
+                        <!-- 각 POST 출력 -->
+                        {% for clubpost in clubposts reversed %}
+                        <div class="post">
+                            <div class="breadcomb-wp post-box1">
+                                <div class="button-icon-btn button-icon-btn-rd" style="margin-top:8px">
+                                    <button class="btn btn-default btn-icon-notika waves-effect "><i class="notika-icon notika-support"></i></button>
+                                </div>
+                                <div class="post-box1-title">
+                                    <b>{{clubpost.title}}</b><br>
+                                    <small>${ismember}</small>
+                                </div>
+                            </div>
+                            <div class="post-text">
+                            <br>{% autoescape off %} {{clubpost.content}} {% endautoescape %}<br><br>
+                            <div class="post-comment" v-html="rawHTML[{{forloop.revcounter0}}]">
+                            </div>
+                            <br>
+                            <div v-if="ismember" class="form-group todo-flex">
+                                <div class="nk-int-st">
+                                    <input type="text" id="comment-input-{{clubpost.id}}" name="comment-input" class="form-control" placeholder="post new comment">
+                                </div>
+                                <div class="todo-send">
+                                    <button v-on:click="commentsubmit({{clubpost.id}})" class="btn-primary btn-md btn-block btn notika-add-todo waves-effect" type="button" id="todo-btn-submit"><i class="notika-icon notika-up-arrow"></i></button>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        {%endfor%}
+                        <div class="post">
+                            <div class="breadcomb-wp post-box1">
+                                <div class="button-icon-btn button-icon-btn-rd" style="margin-top:8px">
+                                    <button class="btn btn-default btn-icon-notika waves-effect "><i class="notika-icon notika-support"></i></button>
+                                </div>
+                                <div class="post-box1-title">
+                                    <b>Title</b><br>
+                                    <small>Name</small>
+                                </div>
+                            </div>
+                            <div class="post-text">
+                            <br>test<br>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
             </div>
 
         </div>
@@ -272,6 +362,10 @@
     <!-- main JS
 		============================================ -->
     <script src="/static/notika/js/main.js"></script>
-</body>
+    <!-- include libraries(jQuery, bootstrap) -->
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script> 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote-lite.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote-lite.js"></script>
 
+</body>
 </html>

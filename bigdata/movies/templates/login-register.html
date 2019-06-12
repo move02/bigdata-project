@@ -86,10 +86,8 @@
         });
       });
 
-      $(document).ready(function(){
-        // VUE+AJAX : 로그인
-        // 기능1 : LoginActive로 POST를 보내 결과를 받는다.
-        // 기능2 : 로그인 성공/실패를 판단,경고를 띄우거나 리디렉션한다.
+    $(document).ready(function(){
+            // VUE+AJAX : 로그인
             var login_app = new Vue({
                   el: '#login_app',
                   data: {
@@ -133,10 +131,6 @@
                     }
                 }
             })
-    });  
-
-
-    $(document).ready(function(){
             // 회원가입 앱
             var register_app = new Vue({
                   el: '#register_app',

@@ -9,6 +9,12 @@ urlpatterns = [
     path('signin', views.signin, name='signin'),
     path('signout', views.signout, name='signout'),
     path('signup', views.signup, name='signup'),
+    path('clublist', views.clublist, name='clublist'),
+    path('clubview', views.clubview, name='clubview'),
+    path('postsubmit', views.postsubmit, name='postsubmit'),
+    path('commentsubmit', views.commentsubmit, name='commentsubmit'),
+    path('myclub', views.myclub, name='myclub'),
+    path('clubmember', views.clubmember, name='clubmember')
 ] 
 urlpatterns+=[
     path('', include('django.contrib.auth.urls')),
