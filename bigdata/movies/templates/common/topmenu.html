@@ -121,7 +121,7 @@
                             <ul class="notika-main-menu-dropdown">
                                 <li><a href="/movies">Dashboard</a>
                                 </li>
-                                <li><a href="#"><strike>Top Rated</strike></a>
+                                <li><a href="/movies/toprated">Top Rated</a>
                                 </li>
                             </ul>
                         </div>
@@ -137,7 +137,13 @@
                             <ul class="notika-main-menu-dropdown">
                                 <li><a href="/movies/movielist">Movie List</a>
                                 </li>
-                                <li><a href="#"><strike>Random Movie</strike></a>
+                                <script>
+                                    function randomlink() {
+                                      var num = Math.floor(Math.random() * 4540) + 1;
+                                      location.href ='/movies/movieview?id='+num;
+                                    }
+                                </script>
+                                <li><a OnClick="randomlink()"><strike>Random Movie</strike></a>
                                 </li>
                             </ul>
                         </div>

@@ -5028,4 +5028,9 @@ background-image: linear-gradient(315deg, #ffdd00 0%, #fbb034 74%);
 .bar1::after{
   max-width: 60%;
 }
-  
+
+.main-box {
+    padding:30px;
+background-color: #fbb034;
+background-image: linear-gradient(315deg, #fbb034 0%, #ffdd00 74%);
+}

@@ -12,8 +12,17 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def index(request):
-    movies = Movie.objects.filter(release_date__gte=datetime.date(2017,5,1)) 
+    movies = Movie.objects.filter(release_date__gte=datetime.date(2017,5,1))
+    usercount = User.objects.all().count
+    clubcount = Club.objects.all().count
+    posts = Post.objects.all()
+    moviecount = Movie.objects.all().count
     return render(request, 'movies/index.html',{
+        'movies' : movies,
+        'moviecount' : moviecount,
+        'usercount' : usercount,
+        'clubcount' : clubcount,
+        'posts' : posts,
         'movies' : movies
     })
 
@@ -162,4 +171,21 @@ def movieview(request):
     prarmmovie = Movie.objects.filter(id=getmovieid)
     return render(request, 'movies/movieview.html', { 
         'movie' : prarmmovie
+    })
+
+def toprated(request):
+    movies = Movie.objects.order_by('-vote_count','-vote_avg')
+    moviecount = movies.count
+    page = request.GET.get('page', 1)
+    paginator = Paginator(movies, 18)
+    try:
+        currentmovies = paginator.page(page)
+    except PageNotAnInteger:
+        currentmovies = paginator.page(1)
+    except EmptyPage:
+        currentmovies = paginator.page(paginator.num_pages)
+
+    return render(request, 'movies/toprated.html', { 
+        'movies': currentmovies,
+        'moviecount' : moviecount
     })
