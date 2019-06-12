@@ -17,7 +17,8 @@ urlpatterns = [
     path('clubmember', views.clubmember, name='clubmember'),
     path('movielist', views.movielist, name='movielist'),
     path('movieview', views.movieview, name='movieview'),
-    path('toprated', views.toprated, name='toprated')
+    path('toprated', views.toprated, name='toprated'),
+    path('clubrecommend', views.clubrecommend, name='clubrecommend')
 ] 
 urlpatterns+=[
     path('', include('django.contrib.auth.urls')),

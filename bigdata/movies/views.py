@@ -97,9 +97,6 @@ def clubview(request):
     for clubpost in clubposts:
         postids.append(clubpost.id)
     clubcomments = Comment.objects.filter(post_id__in=postids)
-    print(clubcomments)
-    #testpost = Post.objects.get(id=1)
-    #Comment.objects.create(content="testcomment",post=testpost,author=currentuser)
     return render(request, 'club/clubview.html',{
         'club' : resultclub,
         'usercount' : usercount,
@@ -132,10 +129,9 @@ def commentsubmit(request):
         return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 def myclub(request):    
-    currentuser = User.objects.filter(id=request.user.id)
-    #print(currentuser.club)
-    response_data = {}
-    return HttpResponse(json.dumps(response_data), content_type="application/json")
+    currentuser = User.objects.get(id=request.user.id)
+    url = '/movies/clubview?id='+str(currentuser.club.id)
+    return redirect(url)
 
 def clubmember(request): 
     getclubid = request.GET['id']
@@ -147,6 +143,18 @@ def clubmember(request):
         'club' : resultclub,
         'usercount' : usercount,
         'members':resultmembers
+    })
+
+def clubrecommend(request): 
+    getclubid = request.GET['id']
+    resultclub = Club.objects.filter(id=getclubid)
+    usercount = User.objects.filter(club_id=getclubid).count
+    clubobj = Club.objects.get(id=getclubid)
+    recommends = clubobj.recommended.all()
+    return render(request, 'club/clubrecommend.html',{
+        'club' : resultclub,
+        'usercount' : usercount,
+        'recommends':recommends
     })
 
 def movielist(request):
