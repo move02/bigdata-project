@@ -135,16 +135,16 @@ class Club(models.Model):
 
 #그룹별 선호도
     def pf_movie():
-        save = open('pfmovie.txt','w')
+        for c in Club.objects.all():
+            c.recommended.all().delete()
         numarrDic = {}
         grouppfDic = {}
         groupnum = 200
 
-        for i in range(200):
+        for i in range(groupnum):
             tempdic = {}
             numdic = {}
             numdicArr=[]
-
 
             print("group : ", i)
             for us in User.objects.filter(club_id=i):
@@ -168,30 +168,31 @@ class Club(models.Model):
 
         #최대 평점 영화 구하기
         for gid in grouppfDic.keys():
-            print(gid)
+            #print(gid)
             tempBV = []
             for mvid in grouppfDic[gid].keys(): #영화 id
-                if numarrDic[gid][mvid] >= 5 and grouppfDic[gid][mvid] >= 4.5:
+                if numarrDic[gid][mvid] >= 5 and grouppfDic[gid][mvid] >= 4.0:
                     mv = Movie.objects.get(id=mvid)
                     tempBV.append(mvid)
                 elif numarrDic[gid][mvid] >= 2 and grouppfDic[gid][mvid] >= 5:
                     mv = Movie.objects.get(id=mvid)
                     #print(gid, ':', mv.title)
                     tempBV.append(mvid)
-
             clubBestmv[gid] = tempBV
 
         #값  확인
-        # for grid in clubBestmv.keys():
-        #     for mvid2 in clubBestmv[grid]:
-        #         mv = Movie.objects.get(id=mvid2)
-        #         print(grid,' : ',mv.title)
-
-
+        for grid in clubBestmv.keys():
+            cl = Club.objects.get(id=grid)
+            for mvid2 in clubBestmv[grid]:
+                mv = Movie.objects.get(id=mvid2)
+                cl.recommended.add(mv)
+                #print(grid,' : ',mv.title)
+                cl.save()
 
     
     def has_member(self, user):
         return self.users.filter(id=user.pk).exists()
+    
     
 class User(AbstractUser):
     username = None
@@ -226,10 +227,22 @@ class User(AbstractUser):
                 pref.save()
 
 #수정 중
-    def signup_club(userid, pre):
+    def signup_club(self):
+        umegenList = ['Animation', 'Comedy', 'Family', 'Adventure', 'Fantasy', 'Romance', 'Drama', 'Action', 'Crime',
+                   'Thriller', 'Horror', 'History', 'Science Fiction', 'Mystery', 'War', 'Foreign', 'Music',
+                   'Docntary', 'Western', 'TV Movie', 'Odyssey Media', 'Pulser Productions', 'Rogue State',
+                   'The Cartel']
+        pre = [2.0 for _ in range(0, 20)]
 
-        kmeans = User.mk_club()
-        #pre = [3.1, 2.1, 3.1, 2.1, 3.1, 2.1, 3.1, 2.1, 3.1, 2.1, 3.1, 2.1, 3.1, 2.1, 3.1, 2.1, 3.1, 2.1, 3.1, 2.1]
+        userid = self.id
+        pref_queryset = self.preferences.all()
+        for prftag in pref_queryset:
+            pre[genList.index(prftag.genre)] = prftag.avg_rating
+
+        import joblib
+        save_file = djangoSettings.STATICFILES_DIRS[0] + '/movies/clustering.sav'
+        kmeans = joblib.load(save_file)
+
         X2 = np.array(pre)
         print(userid, "의 그룹정보 : ", kmeans.predict(X2.reshape(1, -1))[0])
 
@@ -267,6 +280,11 @@ class User(AbstractUser):
         # 클러스터링 하는 부분
         kmeans = KMeans(n_clusters=knum)
         kmeans.fit(X)
+        
+        # 학습 완료된 모델 저장
+        import joblib
+        save_file = djangoSettings.STATICFILES_DIRS[0] + '/movies/clustering.sav'
+        joblib.dump(kmeans, save_file)
 
         for i in range(len(useridList)):
             # dic에 id별 그룹 정보 저장
@@ -311,8 +329,7 @@ class User(AbstractUser):
             u.club_id = Club.objects.get(id=kmeans.labels_[i])
             u.save()
 
-        #클러스터링 모델 return
-        return kmeans
+
 
 
 
