@@ -132,6 +132,7 @@ class User(AbstractUser):
     username = None
     name = models.CharField(max_length=200, unique=True)
     club = models.ForeignKey(Club, on_delete=models.SET_NULL, null=True, default=None, related_name="users")
+    recommended = models.ManyToManyField(Movie, related_name="recommenders")
 
     USERNAME_FIELD = 'name'
     REQUIRED_FIELDS = []
