@@ -110,7 +110,7 @@
                         this.tempHTML = ""
                         {% for clubcomment in clubcomments%}
                             {% if clubcomment.post_id == clubpost.id %}
-                                this.tempHTML += '<b>{{clubcomment.author_id}}</b>&nbsp;&nbsp;&nbsp;{{clubcomment.content}}<br>'
+                                this.tempHTML += '<b>{{clubcomment.author}}</b>&nbsp;&nbsp;&nbsp;{{clubcomment.content}}<br>'
                             {%endif%}
                         {%endfor%}
                         this.rawHTML.push(this.tempHTML)
@@ -118,7 +118,7 @@
                     {% if ismember %}
                     this.ismember = 1
                     {% else %}
-                    this.ismember = 1
+                    this.ismember = 0
                     {% endif %}
                 },
                 methods: {
@@ -243,7 +243,7 @@
                                 </div>
                                 <div class="post-box1-title">
                                     <b>{{clubpost.title}}</b><br>
-                                    <small>${ismember}</small>
+                                    <small>{{clubpost.author}}</small>
                                 </div>
                             </div>
                             <div class="post-text">
@@ -262,20 +262,6 @@
                             </div>
                         </div>
                         {%endfor%}
-                        <div class="post">
-                            <div class="breadcomb-wp post-box1">
-                                <div class="button-icon-btn button-icon-btn-rd" style="margin-top:8px">
-                                    <button class="btn btn-default btn-icon-notika waves-effect "><i class="notika-icon notika-support"></i></button>
-                                </div>
-                                <div class="post-box1-title">
-                                    <b>Title</b><br>
-                                    <small>Name</small>
-                                </div>
-                            </div>
-                            <div class="post-text">
-                            <br>test<br>
-                            </div>
-                        </div>
                     </div>
                 </div> 
             </div>

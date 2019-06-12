@@ -14,7 +14,9 @@ urlpatterns = [
     path('postsubmit', views.postsubmit, name='postsubmit'),
     path('commentsubmit', views.commentsubmit, name='commentsubmit'),
     path('myclub', views.myclub, name='myclub'),
-    path('clubmember', views.clubmember, name='clubmember')
+    path('clubmember', views.clubmember, name='clubmember'),
+    path('movielist', views.movielist, name='movielist'),
+    path('movieview', views.movieview, name='movieview')
 ] 
 urlpatterns+=[
     path('', include('django.contrib.auth.urls')),
