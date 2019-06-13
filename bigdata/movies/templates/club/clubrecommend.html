@@ -96,28 +96,68 @@
         
         
         $(document).ready(function(){
-             
-            Vue.component('honeyc', {
-            delimiters: ['${', '}'],
-              props:['name','index'], 
-              template: "<div class='comb' v-on:click='goto_group()'><div class='front-content'><p>${name}</p></div><div class='back-content'><p>${name}</p></div></div>", 
-              methods: { 
-                  goto_group: function (input) { 
-                  }
-              }
-            })
-            var clubmember_app = new Vue({
-                el: '#clubmember_app',
-                data : {
-                    membernames : []
-                },created: function () {
-                    console.log('{{members}}')
-                    {%for member in members %}
-                        console.log('{{member}}')
-                        this.membernames.push('{{member}}');
-                    {% endfor %}
+            $('#summernote').summernote();
+             var post_app = new Vue({
+                 delimiters: ['${', '}'],
+                 el: '#post_app',
+                 data: {
+                    rawHTML : [],
+                    tempHTML : "",
+                    ismember : Boolean,
+                 },
+                created: function () {
+                    {% for clubpost in clubposts %}
+                        this.tempHTML = ""
+                        {% for clubcomment in clubcomments%}
+                            {% if clubcomment.post_id == clubpost.id %}
+                                this.tempHTML += '<b>{{clubcomment.author}}</b>&nbsp;&nbsp;&nbsp;{{clubcomment.content}}<br>'
+                            {%endif%}
+                        {%endfor%}
+                        this.rawHTML.push(this.tempHTML)
+                    {%endfor%}
+                    {% if ismember %}
+                    this.ismember = 1
+                    {% else %}
+                    this.ismember = 0
+                    {% endif %}
+                },
+                methods: {
+                    postsubmit: function (event) { 
+                        var inputtext = $('#summernote').summernote('code');
+                        var userid = {{user.id}};
+                        var clubid = {{club.0.id}};
+                        var url="/movies/postsubmit";
+                        $.ajax({      
+                            type:"POST",  
+                            url:url,   
+                            data:{"inputtext":inputtext,"authorid":userid,"clubid":clubid}, 
+                            success: function(response){
+                                location.reload();
+                            },   
+                            error:function(e){  
+                                alert(e.responseText);  
+                            } 
+                        });
+                    },
+                    commentsubmit: function (input) { 
+                        id = "#comment-input-"+input
+                        content = $(id).val();
+                        console.log(content);
+                        url = "/movies/commentsubmit"; 
+                        $.ajax({      
+                            type:"POST",  
+                            url:url,   
+                            data:{"post_id":input,"content":content,"author_id":{{user.id}}}, 
+                            success: function(response){
+                                location.reload();
+                            },   
+                            error:function(e){  
+                                alert(e.responseText);  
+                            } 
+                        });
+                    }
                 }
-            });
+             })
         })
     </script>
 </head>
@@ -176,7 +216,7 @@
                     </div>
                     <div class="inbox-left-sd">
                         <div class="inbox-status">
-                            <ul class="inbox-st-nav inbox-ft">
+                             <ul class="inbox-st-nav inbox-ft">
                                 <li><a href="/movies/clubview?id={{club.0.id}}"><i class="notika-icon notika-mail"></i> Posts</a></li>
                                 <li><a href="/movies/clubmember?id={{club.0.id}}"><i class="notika-icon notika-support"></i> Members</a></li>
                                 <li><a href="/movies/clubrecommend?id={{club.0.id}}"><i class="notika-icon notika-bar-chart"></i>Recommended Movies</a></li>
@@ -186,14 +226,30 @@
                     </div>
                 </div>
                 <!--중앙 내용-->
+                <!--우측 메뉴-->
                 <div class="col-md-9">
-                    {% csrf_token %}
-                    <div class="breadcomb-list " style="padding:0px" id="clubmember_app">
-                        <div class="honeycombs">
-                       <honeyc v-for="(name, index) in membernames" v-bind:name="name" v-bind:index="index"></honeyc>
+                    <div class="breadcomb-list" style="padding:0">
+                             {% load mathfilters %}
+                                {% for movie in recommends %}
+                                <div class="col-md-3">
+                                    <div OnClick="location.href ='/movies/movieview?id={{movie.id}}'" style="background-image:url('https://image.tmdb.org/t/p/original/{{movie.poster}}'); background-size:cover; height:250px;"></div>
+                                    <div class="btn btn-default notika-btn-default btn-xs waves-effect" style="width:100%"><br><h5>{{ movie.title }}</h5>
+                                        <div class="skill-content-3 ongoing-tsk">
+                                            <div class="skill" style="height:20px">
+                                                <div class="progress">
+
+                                                    <div class="progress-bar wow fadeInLeft" data-progress="{{ movie.vote_avg |mul:10 }}%" style="width: {{ movie.vote_avg |mul:10 }}%; visibility: visible; animation-duration: 1.5s; animation-delay: 1.2s; animation-name: fadeInLeft;" data-wow-duration="1.5s" data-wow-delay="1.2s"> <span>{{ movie.vote_avg |mul:10 }}</span>
+                                                    </div>
+                                                </div>
+                                                sadasd
+                                            </div>
+                                        </div>  
+                                    </div>
+                                </div>
+                                {% endfor %}
                         </div>
                     </div>
-                </div> 
+                </div>
             </div>
 
         </div>
@@ -278,17 +334,6 @@
     <!-- main JS
 		============================================ -->
     <script src="/static/notika/js/main.js"></script>
-        <link rel="stylesheet" type="text/css" href="/static/honeycombs/css/honeycombs.css" />
-    <script src="/static/honeycombs/js/jquery.honeycombs.js"></script>
-    <script>
-        $(document).ready(function() {
-        $('.honeycombs').honeycombs({
-            combWidth:180,  
-            margin: 0,		
-            threshold: 3 
-        });
-    });
-    </script>
-    
+    <!-- include libraries(jQuery, bootstrap) -->
 </body>
 </html>
