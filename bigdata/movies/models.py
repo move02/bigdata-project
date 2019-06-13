@@ -135,8 +135,6 @@ class Club(models.Model):
 
 #그룹별 선호도
     def pf_movie():
-        for c in Club.objects.all():
-            c.recommended.all().delete()
         numarrDic = {}
         grouppfDic = {}
         groupnum = 200
@@ -192,7 +190,44 @@ class Club(models.Model):
     
     def has_member(self, user):
         return self.users.filter(id=user.pk).exists()
-    
+
+    def make_prefdata(self):
+        import csv,random
+        f = open(djangoSettings.STATICFILES_DIRS[0] + '/movies/data/club_{}.csv'.format(self.id), 'w', encoding='utf-8', newline='')
+        wr = csv.writer(f)
+        wr.writerow(['movie', 'ratings'])
+
+
+        total_count = self.users.count()
+        ucount = 1
+        if total_count > 200:
+            sampling = random.sample(range(0,total_count), k=200)
+            all_users = self.users.all()
+            for ran_num in sampling:
+                u = all_users[ran_num]
+                print("current user no : " + str(ucount))
+                rcount = 1
+                for r in u.ratings.all():
+                    if rcount > 50:
+                        break
+                    wr.writerow([r.movie.id, r.rating])
+                    rcount += 1
+                ucount += 1
+        else:
+            sampling = self.users.all()
+            for u in sampling:
+                print("current user no : " + str(ucount))
+                rcount = 1
+                for r in u.ratings.all():
+                    if rcount > 50:
+                        break
+                    wr.writerow([r.movie.id, r.rating])
+                    rcount += 1
+                ucount += 1
+        
+
+        f.close()
+
 class User(AbstractUser):
     username = None
     name = models.CharField(max_length=200, unique=True)
@@ -205,6 +240,9 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.name
+
+    def subset( self ):
+        return self.id % 29063
 
     def set_preference_tag(self):
         genre_list = Genre.list_of_genres()
