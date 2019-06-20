@@ -217,9 +217,8 @@
         </div>
 
         <!-- Register -->
-        <div class="nk-block" id="l-register">
+        <div class="nk-block" id="l-register" style="width:90%!important">
             
-            <img src="/static/notika/img/logo/big_logo.png">
             <div class="nk-form" id="register_app">
                 {% csrf_token %}
                 <div class="input-group">
@@ -242,7 +241,101 @@
                         <input id="register_pw" type="password" class="form-control" placeholder="Password">
                     </div>
                 </div>
-
+                <!--추천값-->
+                <br>
+                
+                <div class="card mb-3" style="max-width: 540px;">
+                  <div class="row no-gutters">
+                    <div class="col-md-2">
+                      <img src="https://image.tmdb.org/t/p/original//rhIRbceoE9lR4veEXuwCC2wARtG.jpg" class="card-img" alt="..." widht="50px">
+                    </div>
+                    <div class="col-md-10">
+                      <div class="card-body">
+                        <h5 class="card-title2">ToyStory</h5>
+                          <form class="rating">
+                                  <label>
+                                    <input type="radio" name="stars" value="1" />
+                                    <span class="icon">★</span>
+                                  </label>
+                                  <label>
+                                    <input type="radio" name="stars" value="2" />
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                  </label>
+                                  <label>
+                                    <input type="radio" name="stars" value="3" />
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>   
+                                  </label>
+                                  <label>
+                                    <input type="radio" name="stars" value="4" />
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                  </label>
+                                  <label>
+                                    <input type="radio" name="stars" value="5" />
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                  </label>
+                            </form>
+                      </div>
+                    </div>
+                    
+                  </div>
+                </div>
+                
+                <div class="card mb-3" style="max-width: 540px;">
+                  <div class="row no-gutters">
+                    <div class="col-md-2">
+                      <img src="https://image.tmdb.org/t/p/original//xbpSDU3p7YUGlu9Mr6Egg2Vweto.jpg" class="card-img" alt="..." widht="50px">
+                    </div>
+                    <div class="col-md-10">
+                      <div class="card-body">
+                        <h5 class="card-title2">Pirates of the Caribbean: Dead Men Tell No Tales</h5>
+                          <form class="rating">
+                                  <label>
+                                    <input type="radio" name="stars" value="1" />
+                                    <span class="icon">★</span>
+                                  </label>
+                                  <label>
+                                    <input type="radio" name="stars" value="2" />
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                  </label>
+                                  <label>
+                                    <input type="radio" name="stars" value="3" />
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>   
+                                  </label>
+                                  <label>
+                                    <input type="radio" name="stars" value="4" />
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                  </label>
+                                  <label>
+                                    <input type="radio" name="stars" value="5" />
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                    <span class="icon">★</span>
+                                  </label>
+                            </form>
+                      </div>
+                    </div>
+                    
+                  </div>
+                </div>
+               
                 <a v-on:click="submit" class="btn btn-login btn-success btn-float"><i class="notika-icon notika-right-arrow right-arrow-ant"></i></a>
             </div>
 

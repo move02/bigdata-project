@@ -18,6 +18,7 @@ urlpatterns = [
     path('movielist', views.movielist, name='movielist'),
     path('movieview', views.movieview, name='movieview'),
     path('toprated', views.toprated, name='toprated'),
+    path('clubrecommend', views.clubrecommend, name='clubrecommend')
 
     path('genrescount', views.genre_count_page, name='genrescount'),
     path('api/genrescount/<int:year>', views.genres_count, name='genrescount_api'),
