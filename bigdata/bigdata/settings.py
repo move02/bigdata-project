@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_rangepaginator',
     'mathfilters',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
